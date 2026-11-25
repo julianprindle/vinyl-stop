@@ -1,7 +1,7 @@
 # Vinyl Stop
 
-A LUNA Add On that slows audio to a halt like a record on a turntable losing power, or brings it
-up to speed from a standstill. Pitch and time move together, with a smooth glide and no steps.
+A LUNA Add On that slows audio to a halt like a record on a turntable stopping, or brings it
+up to speed from a standstill. A staple effect for modern audio production!
 
 ![Vinyl Stop](.github/screenshot.jpg)
 
@@ -35,10 +35,10 @@ highlighted or no audio tracks selected.
 
 ## How it works
 
-The effect is rendered in the page, not with LUNA's varispeed slices. The page reads each
-track's source audio, plays it through a continuously changing speed with windowed-sinc
-interpolation, builds the fade into the samples, uploads the result as a new audio file and
-places it as a clip.
+The effect is rendered in the page by reading each
+track's source audio, playing it through a continuously changing speed with windowed-sinc
+interpolation, building the fade into the samples, uploading the result as a new audio file and
+placing it as a clip.
 
 ## Develop
 
