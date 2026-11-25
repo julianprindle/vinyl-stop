@@ -1,6 +1,6 @@
 # Vinyl Stop
 
-A LUNA Add On that slows audio to a halt like a record on a turntable stopping, or brings it
+Replicate the sound of a turntable stopping or starting. This LUNA Add On slows audio to a halt like a record player stopping, or brings it
 up to speed from a standstill. A staple effect for modern audio production!
 
 ![Vinyl Stop](.github/screenshot.jpg)
