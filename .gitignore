@@ -1,0 +1,6 @@
+node_modules/
+*.zip
+*.lunaaddon
+.DS_Store
+# art sources, mockups and the Python work folder stay private
+.design/

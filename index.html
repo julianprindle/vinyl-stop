@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinyl Stop</title>
+  <style>
+    /* The deck is drawn at 600x470 (art in img/ is 2x) and scaled to fit the window. */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #c9c6bd; overflow: hidden; user-select: none; -webkit-user-select: none; }
+    #deck { position: absolute; left: 0; top: 0; width: 600px; height: 470px; transform-origin: 0 0;
+            background: url(img/deck.jpg) 0 0 / 600px 470px no-repeat; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+    #deck img, #deck .layer { position: absolute; pointer-events: none; }
+    #deck button { position: absolute; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; outline: none; }
+    #deck button:focus-visible { box-shadow: 0 0 0 2px rgba(247, 196, 73, .9); }
+    [hidden] { display: none !important; }
+
+    /* direction knob: the cap is the hit area; the print swaps between start and stop */
+    #direction { left: 12.5px; top: 72px; width: 143px; height: 118px; border-radius: 50%; }
+    #knob-start, #knob-stop { left: 25.5px; top: 82px; width: 117.5px; height: 100px; }
+
+    /* speed scale: one row per value, the selected one gets the big dot */
+    .speed { left: 156px; width: 68px; height: 19px; border-radius: 3px; }
+    .speed[data-v="tape"] { top: 221.5px; }
+    .speed[data-v="linear"] { top: 240.5px; }
+    .speed[data-v="vinyl"] { top: 259.5px; }
+    #dot { left: 161px; width: 8px; height: 8px; border-radius: 50%; background: #1a1a1a; box-shadow: 0 0 .5px #1a1a1a; }
+
+    /* fade / extend buttons and their LEDs */
+    #fade { left: 271.75px; top: 391.25px; width: 97.5px; height: 23px; border-radius: 1px; }
+    #extend { left: 383.25px; top: 391.75px; width: 94.5px; height: 21.5px; border-radius: 1px; }
+    /* fade / extend legends: live text, so every letter renders crisp at the window's real size.
+       The box's baseline (0.8695em down at line-height 1) sits on the printed baseline. */
+    /* Engraved like start · stop: a little heavier, a light edge below where the cut catches
+       the light, and a faint shadow along the top lip. */
+    .legend { position: absolute; font-size: 14px; line-height: 14px; font-weight: 500; color: rgba(38, 38, 38, .92);
+              text-shadow: 0 1px 0 rgba(255, 255, 255, .78), 0 -.5px 0 rgba(0, 0, 0, .32), 0 0 .5px rgba(0, 0, 0, .25);
+              -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; letter-spacing: 0; white-space: nowrap; pointer-events: none; }
+    #legend-fade { left: 282.75px; top: calc(407.75px - 0.8695em); }
+    #legend-extend { left: 394.25px; top: calc(407.5px - 0.8695em); }
+    /* start · stop: the same engraved legend, at the size of the photo's original print */
+    #legend-go { left: 81.8px; top: calc(361.1px - 0.8695em); font-size: 18px; line-height: 18px; letter-spacing: 1.9px; }
+    #led-fade { left: 342px; top: 394.5px; width: 25.5px; height: 15px; }
+    #led-extend { left: 451.5px; top: 395.5px; width: 25px; height: 15px; }
+
+    /* start · stop: runs the effect; looks pressed while it works */
+    #go { left: 44.5px; top: 297px; width: 183.5px; height: 116.5px; border-radius: 1px; transition: background .06s, box-shadow .06s; }
+    #go:active, #go.busy { background: rgba(0, 0, 0, .10); box-shadow: inset 0 2px 5px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(0, 0, 0, .15); }
+    #go.busy { cursor: progress; }
+    #go:disabled { cursor: default; }
+
+    /* errors print on the record, upper right, in light grey so they read on the black vinyl */
+    #message { position: absolute; left: 230px; right: 22px; top: 16px; height: 18px; line-height: 18px; font-size: 12px; font-weight: 500;
+               text-align: right; color: #e4e2dc; text-shadow: 0 1px 1.2px rgba(0, 0, 0, .66);
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="deck">
+    <img id="knob-start" src="img/knob-start.png" alt="" hidden>
+    <img id="knob-stop" src="img/knob-stop.png" alt="">
+    <button id="direction" title="Direction: click to switch between a start and a stop" aria-label="Direction"></button>
+
+    <div id="dot" class="layer"></div>
+    <button class="speed" data-v="tape" title="Fast: holds speed, then dies (Extend adds 10%)" aria-label="Speed fast"></button>
+    <button class="speed" data-v="linear" title="Medium: an even slowdown (Extend adds 30%)" aria-label="Speed medium"></button>
+    <button class="speed" data-v="vinyl" title="Slow: drops fast, then drags (Extend adds 50%)" aria-label="Speed slow"></button>
+
+    <div id="legend-fade" class="legend">fade</div>
+    <div id="legend-extend" class="legend">extend</div>
+    <img id="led-fade" src="img/led-fade.png" alt="" hidden>
+    <img id="led-extend" src="img/led-extend.png" alt="" hidden>
+    <button id="fade" title="Fade to silence over the slow end" aria-label="Fade"></button>
+    <button id="extend" title="Extend: lit, the effect runs longer than the selection (past it for a stop, before it for a start). Off, it fits the selection." aria-label="Extend"></button>
+
+    <button id="go" disabled title="Make the stop or start on the highlighted range of the selected tracks" aria-label="Start or stop"></button>
+    <div id="legend-go" class="legend">start · stop</div>
+    <div id="message" role="status"></div>
+  </div>
+  <script src="vendor/luna.global.js"></script>
+  <script src="logic.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+    "package_name": "Vinyl Stop",
+    "id": "com.julianprindle.vinyl_stop",
+    "title": "Vinyl Stop",
+    "version": "1.0.0",
+    "manufacturer": "Julian Prindle",
+    "description": "Slows audio to a halt like a record on a turntable losing power, or brings it up to speed from a standstill, pitch and time together.",
+    "categories": [
+        "Create",
+        "Editing"
+    ],
+    "sdk_version": "3.1.2",
+    "min_luna_version": "3.1.2",
+    "engines": [
+        "luna"
+    ],
+    "html": "index.html",
+    "target": "window",
+    "floating": true,
+    "show_with_session": true,
+    "fixed_size": true,
+    "width": 600,
+    "height": 470
+}
